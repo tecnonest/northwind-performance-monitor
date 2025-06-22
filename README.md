@@ -8,6 +8,12 @@ A comprehensive performance monitoring and testing suite for comparing SQL vs Gr
 ![Grafana](https://img.shields.io/badge/Grafana-Dashboards-orange)
 ![Prometheus](https://img.shields.io/badge/Prometheus-Metrics-red)
 
+## 📸 Dashboard Preview
+
+![Dashboard Screenshot](./assets/views.png)
+
+*Live dashboard showing real-time performance metrics, system status, and test results*
+
 ## 📋 Features
 
 ### 🔍 Performance Testing
