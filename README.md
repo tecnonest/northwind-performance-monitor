@@ -67,7 +67,7 @@ A comprehensive performance monitoring and testing suite for comparing SQL vs Gr
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/northwind-performance-monitor.git
+git clone https://github.com/tecnonest/northwind-performance-monitor.git
 cd northwind-performance-monitor
 ```
 
@@ -269,9 +269,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- 📧 Issues: [GitHub Issues](https://github.com/YOUR_USERNAME/northwind-performance-monitor/issues)
+- 📧 Issues: [GitHub Issues](https://github.com/tecnonest/northwind-performance-monitor/issues)
 - 📖 Documentation: Check this README and API docs
-- 💬 Discussions: [GitHub Discussions](https://github.com/YOUR_USERNAME/northwind-performance-monitor/discussions)
+- 💬 Discussions: [GitHub Discussions](https://github.com/tecnonest/northwind-performance-monitor/discussions)
 
 ---
 

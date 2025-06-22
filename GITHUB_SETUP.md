@@ -19,8 +19,8 @@ Bu projeyi GitHub'da public olarak paylaşmak için aşağıdaki adımları taki
 Terminalden aşağıdaki komutları çalıştırın:
 
 ```bash
-# GitHub remote'unu ekleyin (YOUR_USERNAME kısmını kendi GitHub kullanıcı adınızla değiştirin)
-git remote add origin https://github.com/YOUR_USERNAME/northwind-performance-monitor.git
+# GitHub remote'unu ekleyin
+git remote add origin https://github.com/tecnonest/northwind-performance-monitor.git
 
 # Ana branch'i ayarlayın
 git branch -M main
@@ -49,12 +49,13 @@ Settings > General bölümünde:
 Repository oluşturduktan sonra README.md dosyasındaki placeholder URL'leri güncelleyin:
 
 ```bash
-# README.md dosyasını düzenleyin
-sed -i 's/YOUR_USERNAME/GERÇEK_KULLANICI_ADINIZ/g' README.md
+# README.md dosyası zaten güncellenmiştir
+# Eğer başka dosyalarda placeholder varsa:
+# sed -i 's/YOUR_USERNAME/tecnonest/g' dosya_adi
 
 # Değişiklikleri commit edin
 git add README.md
-git commit -m "📝 Update GitHub URLs in README"
+git commit -m "📝 Update GitHub URLs to tecnonest"
 git push
 ```
 
