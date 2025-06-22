@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Northwind Performance Monitor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .metric-card {
+            border-left: 4px solid #007bff;
+            transition: transform 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .status-healthy { border-left-color: #28a745; }
+        .status-warning { border-left-color: #ffc107; }
+        .status-critical { border-left-color: #dc3545; }
+        
+        .chart-container {
+            height: 400px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-chart-line me-2"></i>
+                Northwind Performance Monitor
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#overview">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tests">Performance Tests</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reports">Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#admin">Admin</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- System Status Overview -->
+        <section id="overview" class="mb-5">
+            <h2 class="mb-4">System Status Overview</h2>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="card metric-card status-healthy">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-muted">Database</h6>
+                                    <h4 class="text-success">Healthy</h4>
+                                    <small class="text-muted">5ms response</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-database fa-2x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card metric-card status-healthy">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-muted">GraphQL API</h6>
+                                    <h4 class="text-success">Healthy</h4>
+                                    <small class="text-muted">12ms response</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-code fa-2x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card metric-card status-healthy">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-muted">Redis Cache</h6>
+                                    <h4 class="text-success">Healthy</h4>
+                                    <small class="text-muted">92% hit rate</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-memory fa-2x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card metric-card status-warning">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-muted">System Load</h6>
+                                    <h4 class="text-warning">Moderate</h4>
+                                    <small class="text-muted">CPU: 65%</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-server fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Tests -->
+        <section id="tests" class="mb-5">
+            <h2 class="mb-4">Performance Tests</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Available Tests</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Simple SELECT Query</h6>
+                                        <p class="mb-1 text-muted">Basic data retrieval with LIMIT</p>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm" onclick="runTest('simple_select')">
+                                        <i class="fas fa-play me-1"></i>Run Test
+                                    </button>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Customer Orders JOIN</h6>
+                                        <p class="mb-1 text-muted">Complex JOIN with filtering and ordering</p>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm" onclick="runTest('customer_orders')">
+                                        <i class="fas fa-play me-1"></i>Run Test
+                                    </button>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Order Aggregation</h6>
+                                        <p class="mb-1 text-muted">Aggregation queries with date filtering</p>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm" onclick="runTest('order_aggregation')">
+                                        <i class="fas fa-play me-1"></i>Run Test
+                                    </button>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Complex Multi-table JOIN</h6>
+                                        <p class="mb-1 text-muted">Advanced query across multiple tables</p>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm" onclick="runTest('complex_join')">
+                                        <i class="fas fa-play me-1"></i>Run Test
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-success me-2" onclick="runAllTests()">
+                                    <i class="fas fa-rocket me-1"></i>Run All Tests
+                                </button>
+                                <button class="btn btn-warning me-2" onclick="runConcurrentTest()">
+                                    <i class="fas fa-users me-1"></i>Concurrent Test
+                                </button>
+                                <button class="btn btn-info" onclick="generateData()">
+                                    <i class="fas fa-database me-1"></i>Generate Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Test Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="test-status">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-clock fa-2x mb-2"></i>
+                                    <p>No tests running</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Charts -->
+        <section id="charts" class="mb-5">
+            <h2 class="mb-4">Performance Metrics</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">SQL vs GraphQL Response Times</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="responseTimeChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Cache Performance</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="cacheChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">System Resources</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="systemChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Database Connections</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="dbChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Links -->
+        <section id="quick-links" class="mb-5">
+            <h2 class="mb-4">Quick Links</h2>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <a href="http://localhost:3000" target="_blank" class="card text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-area fa-2x text-primary mb-2"></i>
+                            <h6>Grafana Dashboard</h6>
+                            <small class="text-muted">Advanced metrics visualization</small>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="http://localhost:8080" target="_blank" class="card text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="fas fa-code fa-2x text-success mb-2"></i>
+                            <h6>Hasura Console</h6>
+                            <small class="text-muted">GraphQL API management</small>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="http://localhost:9090" target="_blank" class="card text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="fas fa-server fa-2x text-warning mb-2"></i>
+                            <h6>Prometheus</h6>
+                            <small class="text-muted">Metrics collection</small>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="#" onclick="downloadReport()" class="card text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="fas fa-download fa-2x text-info mb-2"></i>
+                            <h6>Download Report</h6>
+                            <small class="text-muted">Export performance results</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Status Toast -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="status-toast" class="toast" role="alert">
+            <div class="toast-header">
+                <strong class="me-auto">System Status</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toast-message">
+                Status message will appear here
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // API base URL
+        const API_BASE = '/api/v1';
+
+        // Chart variables
+        let responseTimeChart, cacheChart, systemChart, dbChart;
+
+        // Initialize charts
+        function initializeCharts() {
+            // Response Time Chart
+            const responseTimeCtx = document.getElementById('responseTimeChart').getContext('2d');
+            responseTimeChart = new Chart(responseTimeCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'SQL Response Time (ms)',
+                        data: [],
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1
+                    }, {
+                        label: 'GraphQL Response Time (ms)',
+                        data: [],
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Response Time (ms)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Cache Chart
+            const cacheCtx = document.getElementById('cacheChart').getContext('2d');
+            cacheChart = new Chart(cacheCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Cache Hits', 'Cache Misses'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: ['#28a745', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // System Chart
+            const systemCtx = document.getElementById('systemChart').getContext('2d');
+            systemChart = new Chart(systemCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['CPU %', 'Memory %', 'Disk %'],
+                    datasets: [{
+                        label: 'Usage %',
+                        data: [0, 0, 0],
+                        backgroundColor: ['#ffc107', '#17a2b8', '#6f42c1']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Usage %'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Database Connections Chart
+            const dbCtx = document.getElementById('dbChart').getContext('2d');
+            dbChart = new Chart(dbCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Active', 'Idle'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: ['#007bff', '#6c757d']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update charts with real data
+        async function updateCharts() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Update system chart
+                    systemChart.data.datasets[0].data = [
+                        data.system.cpu_percent,
+                        data.system.memory_percent,
+                        data.system.disk_percent
+                    ];
+                    systemChart.update();
+
+                    // Update cache chart
+                    const totalCacheOps = data.cache.hits + data.cache.misses;
+                    if (totalCacheOps > 0) {
+                        cacheChart.data.datasets[0].data = [data.cache.hits, data.cache.misses];
+                    } else {
+                        cacheChart.data.datasets[0].data = [1, 0]; // Show some data when no operations
+                    }
+                    cacheChart.update();
+
+                    // Update database connections chart
+                    const connections = data.database.connections;
+                    let activeConns = 0, idleConns = 0;
+                    connections.forEach(conn => {
+                        if (conn.state === 'active') activeConns += conn.count;
+                        if (conn.state === 'idle') idleConns += conn.count;
+                    });
+                    dbChart.data.datasets[0].data = [activeConns, idleConns];
+                    dbChart.update();
+
+                    // Update status cards with real data
+                    updateStatusCards(data);
+                }
+
+                // Update response time chart with test results
+                const testResponse = await fetch(`${API_BASE}/performance/results?limit=10`);
+                if (testResponse.ok) {
+                    const testData = await testResponse.json();
+                    const testResults = testData.results || [];
+                    if (testResults.length > 0) {
+                        const labels = testResults.map((_, i) => `Test ${i + 1}`);
+                        const sqlTimes = testResults.map(result => 
+                            result.sql_time ? result.sql_time * 1000 : 0
+                        );
+                        const graphqlTimes = testResults.map(result => 
+                            result.graphql_time ? result.graphql_time * 1000 : 0
+                        );
+                        
+                        responseTimeChart.data.labels = labels;
+                        responseTimeChart.data.datasets[0].data = sqlTimes;
+                        responseTimeChart.data.datasets[1].data = graphqlTimes;
+                        responseTimeChart.update();
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        // Update status cards
+        function updateStatusCards(data) {
+            // You can update the status cards here with real data
+            // For now, we'll keep the static values but this is where you'd update them
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('status-toast');
+            const toastBody = document.getElementById('toast-message');
+            toastBody.textContent = message;
+            
+            // Add color based on type
+            toast.className = `toast show bg-${type}`;
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        // Run individual test
+        async function runTest(testName) {
+            try {
+                showToast(`Starting ${testName} test...`, 'info');
+                
+                const response = await fetch(`${API_BASE}/performance/run-test/${testName}`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showToast(`Test ${testName} started successfully`, 'success');
+                    updateTestStatus();
+                } else {
+                    showToast(`Failed to start test ${testName}`, 'danger');
+                }
+            } catch (error) {
+                showToast(`Error: ${error.message}`, 'danger');
+            }
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            try {
+                showToast('Starting comprehensive test suite...', 'info');
+                
+                const response = await fetch(`${API_BASE}/performance/run-all-tests`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showToast('Comprehensive tests started', 'success');
+                    updateTestStatus();
+                } else {
+                    showToast('Failed to start comprehensive tests', 'danger');
+                }
+            } catch (error) {
+                showToast(`Error: ${error.message}`, 'danger');
+            }
+        }
+
+        // Run concurrent test
+        async function runConcurrentTest() {
+            try {
+                showToast('Starting concurrent user simulation...', 'info');
+                
+                const response = await fetch(`${API_BASE}/performance/run-concurrent-test/simple_select`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showToast('Concurrent test started', 'success');
+                    updateTestStatus();
+                } else {
+                    showToast('Failed to start concurrent test', 'danger');
+                }
+            } catch (error) {
+                showToast(`Error: ${error.message}`, 'danger');
+            }
+        }
+
+        // Generate test data
+        async function generateData() {
+            try {
+                showToast('Starting data generation...', 'info');
+                
+                const response = await fetch(`${API_BASE}/generate-data`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showToast('Data generation started (estimated 30-60 minutes)', 'success');
+                } else {
+                    showToast('Failed to start data generation', 'danger');
+                }
+            } catch (error) {
+                showToast(`Error: ${error.message}`, 'danger');
+            }
+        }
+
+        // Update test status
+        async function updateTestStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/performance/test-status`);
+                if (response.ok) {
+                    const status = await response.json();
+                    const statusDiv = document.getElementById('test-status');
+                    
+                    if (status.status === 'idle') {
+                        statusDiv.innerHTML = `
+                            <div class="text-center text-muted">
+                                <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+                                <p><strong>Ready to Run Tests</strong></p>
+                                <small class="text-muted">Completed: ${status.completed_tests} tests</small>
+                            </div>
+                        `;
+                    } else if (status.status === 'running_individual') {
+                        statusDiv.innerHTML = `
+                            <div class="text-center">
+                                <div class="spinner-border text-primary mb-2" role="status"></div>
+                                <p class="mb-1"><strong>Running Individual Test</strong></p>
+                                <small class="text-muted">Completed: ${status.completed_tests} tests</small>
+                            </div>
+                        `;
+                    } else if (status.status === 'running_comprehensive') {
+                        statusDiv.innerHTML = `
+                            <div class="text-center">
+                                <div class="spinner-border text-warning mb-2" role="status"></div>
+                                <p class="mb-1"><strong>Running Comprehensive Tests</strong></p>
+                                <small class="text-muted">Completed: ${status.completed_tests} tests</small>
+                            </div>
+                        `;
+                    } else if (status.status === 'running_concurrent') {
+                        statusDiv.innerHTML = `
+                            <div class="text-center">
+                                <div class="spinner-border text-info mb-2" role="status"></div>
+                                <p class="mb-1"><strong>Running Concurrent Tests</strong></p>
+                                <small class="text-muted">Completed: ${status.completed_tests} tests</small>
+                            </div>
+                        `;
+                    } else if (status.status === 'completed') {
+                        statusDiv.innerHTML = `
+                            <div class="text-center">
+                                <i class="fas fa-check fa-2x mb-2 text-success"></i>
+                                <p class="mb-1"><strong>Tests Completed</strong></p>
+                                <small class="text-muted">Total: ${status.completed_tests} tests</small>
+                            </div>
+                        `;
+                    } else if (status.status === 'failed') {
+                        statusDiv.innerHTML = `
+                            <div class="text-center">
+                                <i class="fas fa-exclamation-triangle fa-2x mb-2 text-danger"></i>
+                                <p class="mb-1"><strong>Test Failed</strong></p>
+                                <small class="text-muted">Completed: ${status.completed_tests} tests</small>
+                            </div>
+                        `;
+                    } else {
+                        statusDiv.innerHTML = `
+                            <div class="text-center">
+                                <div class="spinner-border text-secondary mb-2" role="status"></div>
+                                <p class="mb-1"><strong>Status: ${status.status}</strong></p>
+                                <small class="text-muted">Completed: ${status.completed_tests} tests</small>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating test status:', error);
+            }
+        }
+
+        // Download report
+        function downloadReport() {
+            showToast('Report download feature coming soon...', 'info');
+        }
+
+        // Update status every 5 seconds
+        setInterval(updateTestStatus, 5000);
+        setInterval(updateCharts, 5000);
+
+        // Initial status update
+        updateTestStatus();
+
+        // Show welcome message and initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            updateCharts();
+            showToast('Welcome to Northwind Performance Monitor!', 'success');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+groups:
+  - name: performance_alerts
+    rules:
+      - alert: HighResponseTime
+        expr: avg_over_time(response_time_ms[5m]) > 1000
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "Average response time has been above 1000ms for more than 2 minutes"
+
+      - alert: LowCacheHitRate
+        expr: cache_hit_rate_percent < 70
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate has been below 70% for more than 5 minutes"
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage has been above 80% for more than 5 minutes"
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage has been above 85% for more than 5 minutes"
+
+      - alert: DatabaseConnectionHigh
+        expr: pg_stat_activity_count > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database connections"
+          description: "Database connection count is high"
+
+      - alert: SlowQueries
+        expr: avg_over_time(pg_stat_statements_mean_time_ms[10m]) > 5000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Average query execution time has been above 5 seconds"
