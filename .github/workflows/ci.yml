@@ -1,0 +1,127 @@
+name: 🚀 CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: 🧪 Test & Validate
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: 🐳 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: 🔧 Create environment file
+      run: |
+        cp .env.example .env
+        
+    - name: 🚀 Start services
+      run: |
+        docker-compose up -d
+        
+    - name: ⏳ Wait for services
+      run: |
+        echo "Waiting for services to be ready..."
+        sleep 60
+        
+    - name: 🔍 Check service health
+      run: |
+        echo "Checking service health..."
+        docker-compose ps
+        
+        # Check if all services are running
+        if [ $(docker-compose ps --services --filter "status=running" | wc -l) -eq $(docker-compose ps --services | wc -l) ]; then
+          echo "✅ All services are running"
+        else
+          echo "❌ Some services are not running"
+          docker-compose logs
+          exit 1
+        fi
+        
+    - name: 🌐 Test API endpoints
+      run: |
+        echo "Testing API endpoints..."
+        
+        # Test main UI
+        curl -f http://localhost:8000/ || (echo "❌ Main UI failed" && exit 1)
+        echo "✅ Main UI is responding"
+        
+        # Test API health
+        curl -f http://localhost:8000/api/v1/stats || (echo "❌ Stats API failed" && exit 1)
+        echo "✅ Stats API is responding"
+        
+        # Test metrics endpoint
+        curl -f http://localhost:8000/metrics || (echo "❌ Metrics endpoint failed" && exit 1)
+        echo "✅ Metrics endpoint is responding"
+        
+        # Test Grafana
+        curl -f http://localhost:3000/api/health || (echo "❌ Grafana failed" && exit 1)
+        echo "✅ Grafana is responding"
+        
+        # Test Prometheus
+        curl -f http://localhost:9090/-/healthy || (echo "❌ Prometheus failed" && exit 1)
+        echo "✅ Prometheus is responding"
+        
+    - name: 🧪 Run performance test
+      run: |
+        echo "Running a quick performance test..."
+        response=$(curl -s -X POST http://localhost:8000/api/v1/performance/run-test/simple_select)
+        echo "Test response: $response"
+        
+        if echo "$response" | grep -q "started"; then
+          echo "✅ Performance test started successfully"
+        else
+          echo "❌ Performance test failed to start"
+          exit 1
+        fi
+        
+    - name: 📊 Check test results
+      run: |
+        echo "Waiting for test to complete..."
+        sleep 10
+        
+        results=$(curl -s http://localhost:8000/api/v1/performance/results)
+        echo "Test results: $results"
+        
+        if echo "$results" | grep -q "results"; then
+          echo "✅ Test results are available"
+        else
+          echo "❌ No test results found"
+          exit 1
+        fi
+        
+    - name: 🧹 Cleanup
+      if: always()
+      run: |
+        echo "Cleaning up..."
+        docker-compose down -v
+        docker system prune -f
+
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔍 Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: 📊 Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
